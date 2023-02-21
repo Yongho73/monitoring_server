@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.bizmarvel.ccdm.mapper.dashboard.DashboardMapper">
+
+    <select id="getDeviceListCnt" resultType="int">
+        select count(*)
+          from tb_device_info a
+        inner join tb_comm_code b on a.deviceType  = b.code  and b.upper_code  = 'DEVICE_TYPE'
+        inner join tb_comm_code c on a.exhaustType  = c.code  and c.upper_code  = 'EXHAUST_TYPE'
+        where 1 = 1
+        and regiStusDstcd in (10, 20)
+        <if test='searchArea != null and searchArea != ""'>
+          and a.areaCode = #{searchArea}
+        </if>
+        <if test='searchCompany != null and searchCompany != ""'>
+          and a.companyName = #{searchCompany}
+        </if>
+        <if test='searchExhaustType != null and searchExhaustType != ""'>
+          and a.exhaustType = #{searchExhaustType}
+        </if>
+        <if test='searchName != null and searchName != ""'>
+          and (  d.code_name like concat('%',#{searchName},'%') OR
+                 a.companyName like concat('%',#{searchName},'%') OR
+                 c.code_name like concat('%',#{searchName},'%') OR
+                 a.deviceCode like concat('%',#{searchName},'%') OR
+                 b.code_name like concat('%',#{searchName},'%') OR
+                 a.deviceName like concat('%',#{searchName},'%') )
+        </if>
+    </select>
+
+    <select id="getDeviceList"  parameterType="kr.co.bizmarvel.ccdm.vo.device.DeviceVO" resultType="kr.co.bizmarvel.ccdm.vo.device.DeviceVO">
+        select a.deviceidnfr ,
+               a.deviceCode ,
+               a.deviceName ,
+               c.code_name AS exhaustType,
+               b.code_name AS deviceType,
+               d.code_name AS locationName ,
+               a.registusdstcd,
+               a.companyName ,
+               SUBSTRING_INDEX(a.`location(DD)` , ',', 1) as lat,
+               SUBSTRING_INDEX(a.`location(DD)` , ',', -1) as lng
+          from tb_device_info a
+        inner join tb_comm_code b on a.deviceType  = b.code  and b.upper_code  = 'DEVICE_TYPE'
+        inner join tb_comm_code c on a.exhaustType  = c.code  and c.upper_code  = 'EXHAUST_TYPE'
+        inner join tb_comm_code d on a.areaCode  = d.code  and d.upper_code  = 'AREA_SI'
+        where 1 = 1
+        and regiStusDstcd in (10, 20)
+        <if test='searchArea != null and searchArea != ""'>
+          and a.areaCode = #{searchArea}
+        </if>
+        <if test='searchCompany != null and searchCompany != ""'>
+          and a.companyName = #{searchCompany}
+        </if>
+        <if test='searchExhaustType != null and searchExhaustType != ""'>
+          and a.exhaustType = #{searchExhaustType}
+        </if>
+        <if test='searchName != null and searchName != ""'>
+          and (  d.code_name like concat('%',#{searchName},'%') OR
+                 a.companyName like concat('%',#{searchName},'%') OR
+                 c.code_name like concat('%',#{searchName},'%') OR
+                 a.deviceCode like concat('%',#{searchName},'%') OR
+                 b.code_name like concat('%',#{searchName},'%') OR
+                 a.deviceName like concat('%',#{searchName},'%') )
+        </if>
+        order by a.areaCode
+        LIMIT #{startIndex} , #{lastIndex}
+    </select>
+
+    <select id="getDeviceExcelList" parameterType="kr.co.bizmarvel.ccdm.vo.dashboard.DashboardVO" resultType="kr.co.bizmarvel.ccdm.vo.device.DeviceExcelVO">
+        select a.deviceCode ,
+               a.deviceName ,
+               c.code_name AS exhaustType,
+               b.code_name AS deviceType ,
+               d.code_name AS locationName ,
+               a.companyName ,
+               SUBSTRING_INDEX(a.`location(DD)` , ',', 1) as lat,
+               SUBSTRING_INDEX(a.`location(DD)` , ',', -1) as lng
+          from tb_device_info a
+        inner join tb_comm_code b on a.deviceType  = b.code  and b.upper_code  = 'DEVICE_TYPE'
+        inner join tb_comm_code c on a.exhaustType  = c.code  and c.upper_code  = 'EXHAUST_TYPE'
+        inner join tb_comm_code d on a.areaCode  = d.code  and d.upper_code  = 'AREA_SI'
+        where 1 = 1
+        <if test='searchArea != null and searchArea != ""'>
+          and a.areaCode = #{searchArea}
+        </if>
+        <if test='searchCompany != null and searchCompany != ""'>
+          and a.companyName = #{searchCompany}
+        </if>
+        <if test='searchExhaustType != null and searchExhaustType != ""'>
+          and a.exhaustType = #{searchExhaustType}
+        </if>
+        <if test='searchName != null and searchName != ""'>
+          and (  d.code_name like concat('%',#{searchName},'%') OR
+                 a.companyName like concat('%',#{searchName},'%') OR
+                 c.code_name like concat('%',#{searchName},'%') OR
+                 a.deviceCode like concat('%',#{searchName},'%') OR
+                 b.code_name like concat('%',#{searchName},'%') OR
+                 a.deviceName like concat('%',#{searchName},'%') )
+        </if>
+        order by a.areaCode
+    </select>
+
+    <select id="getObservationCnt" parameterType="kr.co.bizmarvel.ccdm.vo.dashboard.DashboardVO" resultType="int">
+        SELECT count(*)
+        FROM tb_observation_info oi
+        INNER JOIN tb_device_info di on oi.deviceIdnfr = di.deviceIdnfr
+        where di.deviceIdnfr = #{deviceIdnfr}
+    </select>
+
+    <select id="getObservationList" parameterType="dashboardVO" resultType="hmap">
+        SELECT in_Oxygen
+             , in_Carbon
+             , in_Methane
+             , in_AirCurrent
+             , out_Oxygen
+             , out_Carbon
+             , out_Methane
+             , out_AirCurrent
+             , st_Temp
+             , st_Humi
+             , DATE_FORMAT(observedDate, '%Y-%m-%d %H:%i:%s') as observedDate
+             , DATE_FORMAT(regDate, '%Y-%m-%d %H:%i:%s') as regDate
+             , regWorker
+        FROM tb_observation_info oi
+        INNER JOIN tb_device_info di on oi.deviceIdnfr = di.deviceIdnfr
+        where di.deviceIdnfr = #{deviceIdnfr}
+        order by observedDate desc
+        LIMIT #{startIndex} , #{lastIndex}
+    </select>
+
+    <select id="getObservationListForExcel" parameterType="hmap" resultType="hmap">
+        SELECT TRUNCATE(in_Oxygen / 100, 2) as in_Oxygen
+             , in_Carbon as in_Carbon
+             , in_Methane as in_Methane
+             , in_AirCurrent as in_AirCurrent
+             , TRUNCATE(out_Oxygen / 100, 2) as out_Oxygen
+             , out_Carbon as out_Carbon
+             , out_Methane as out_Methane
+             , out_AirCurrent as out_AirCurrent
+             , st_Temp as st_Temp
+             , st_Humi as st_Humi
+             , TRUNCATE((out_Oxygen / 100) - (in_Oxygen / 100), 2) as diff_oxygen
+             , convert(in_Carbon, signed) - convert(out_Carbon, signed) as diff_carbon
+             , DATE_FORMAT(observedDate, '%Y-%m-%d %H:%i:%s') as observedDate
+             , DATE_FORMAT(regDate, '%Y-%m-%d %H:%i:%s') as regDate
+             , regWorker
+        FROM tb_observation_info oi
+        INNER JOIN tb_device_info di on oi.deviceIdnfr = di.deviceIdnfr
+        where di.deviceCode = #{deviceCode}
+ <![CDATA[and oi.observedDate >= concat(#{date}, '000000')
+          and oi.observedDate <= concat(#{date}, '235959')]]>
+    </select>
+
+    <select id="selectDeviceInfo" parameterType="long" resultType="hmap">
+        select di.deviceIdnfr
+             , di.deviceCode
+             , di.companyName
+             , di.deviceName
+             , (select code_name from tb_comm_code where code = di.exhaustType and upper_code = 'EXHAUST_TYPE') as exhaustType
+             , (select code_name from tb_comm_code where code = di.deviceType and upper_code = 'DEVICE_TYPE') as deviceType
+        from tb_device_info di
+        where di.deviceIdnfr = #{deviceIdnfr}
+    </select>
+
+</mapper>

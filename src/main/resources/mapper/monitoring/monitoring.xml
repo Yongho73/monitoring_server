@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.bizmarvel.ccdm.mapper.monitoring.MonitoringDao">
+
+    <select id="getMonitoringListCnt" resultType="int">
+        select count(*)
+        from tb_observation_info a
+                 inner join tb_device_info b on a.deviceIdnfr = b.deviceIdnfr
+        where (a.deviceIdnfr , a.observedDate) IN ( select toi.deviceIdnfr , MAX(toi.observedDate) as observedDate from tb_observation_info toi group by deviceIdnfr )
+        order by a.deviceIdnfr
+    </select>
+
+    <select id="getMonitoringList"  parameterType="monitoringVO" resultType="monitoringVO">
+        select a.deviceIdnfr ,
+               a.out_Oxygen as oxygen,
+               a.out_Carbon as carbon,
+               a.out_Methane as methane,
+               a.out_AirCurrent as airCurrent,
+               SUBSTRING_INDEX(b.`location(DD)` , ',', 1) as lat,
+               SUBSTRING_INDEX(b.`location(DD)` , ',', -1) as lng
+         from tb_observation_info a
+        inner join tb_device_info b on a.deviceIdnfr = b.deviceIdnfr
+        where (a.deviceIdnfr , a.observedDate) IN ( select toi.deviceIdnfr , MAX(toi.observedDate) as observedDate from tb_observation_info toi group by deviceIdnfr )
+        order by a.deviceIdnfr
+        LIMIT #{startIndex} , #{lastIndex}
+    </select>
+
+    <select id="getMonitoringExcelList" resultType="dashboardExcelVO">
+        select a.deviceIdnfr ,
+               a.out_Oxygen as oxygen,
+               a.out_Carbon as carbon,
+               a.out_Methane as methane,
+               a.out_AirCurrent as airCurrent,
+               SUBSTRING_INDEX(b.`location(DD)` , ',', 1) as lat,
+               SUBSTRING_INDEX(b.`location(DD)` , ',', -1) as lng
+         from tb_observation_info a
+        inner join tb_device_info b on a.deviceIdnfr = b.deviceIdnfr
+        where (a.deviceIdnfr , a.observedDate) IN ( select toi.deviceIdnfr , MAX(toi.observedDate) as observedDate from tb_observation_info toi group by deviceIdnfr )
+        order by a.deviceIdnfr
+    </select>
+
+
+</mapper>

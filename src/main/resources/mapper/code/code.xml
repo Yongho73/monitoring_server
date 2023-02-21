@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.bizmarvel.ccdm.mapper.code.CodeMapper">
+
+    <select id="getCommCodeList"  parameterType="codeVO" resultType="codeVO">
+        select code ,
+               code_name
+          from tb_comm_code tcc
+        where 1 = 1
+        <if test='upperCode != null and upperCode != ""'>
+          and upper_code = #{upperCode}
+        </if>
+    </select>
+
+     <select id="getDeviceCompanyList"  resultType="codeVO">
+     select companyName AS CODE ,
+            companyName AS CODE_NAME
+       from tb_device_info
+      where companyName is not null
+     GROUP BY companyName
+    </select>
+
+     <select id="getSidoList" resultType="hmap">
+         SELECT sido_id
+              , sido_name
+              , sido_encName
+              , sido_lat
+              , sido_lan
+         FROM tb_map_sido_info
+     </select>
+
+     <insert id="insertWeatherInfo" parameterType="weatherVO">
+         INSERT INTO tb_weather_info (
+               sido_enc
+             , weather
+             , description
+             , icon
+             , icon_title
+             , temp
+             , humidity
+             , co
+             , `no`
+             , no2
+             , o3
+             , so2
+             , pm2_5
+             , pm10
+             , nh3
+             , carbonIntensity
+             , fossilFuelPercentage
+         ) VALUES(
+            #{city}
+            , #{weather}
+            , #{description}
+            , #{icon}
+            , #{icon_title}
+            , #{temp}
+            , #{humidity}
+            , #{co}
+            , #{no}
+            , #{no2}
+            , #{o3}
+            , #{so2}
+            , #{pm2_5}
+            , #{pm10}
+            , #{nh3}
+            , #{carbonIntensity}
+            , #{fossilFuelPercentage}
+        );
+     </insert>
+
+</mapper>

@@ -1,0 +1,33 @@
+# 운영 서버 1
+
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    name: mysql
+    url: jdbc:log4jdbc:mysql://127.0.0.1:3306/ccdm_dev?useSSL=false&autoReconnect=true&useUnicode=true&characterEncoding=utf-8
+    username: 
+    password: 
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    pool-init-size: 10
+    pool-max-size: 100
+    validation-query: SELECT 1
+    hikari:
+      connection-timeout: 10000
+      idle-timeout: 10000
+      max-lifetime: 580000
+      validation-timeout: 10000
+      maximum-pool-size: 100
+      minimum-idle: 10
+  devtools:
+    livereload:
+      enabled: false
+  data:
+    mongodb:
+      host: 127.0.0.1
+      port: 27017
+      database: bizmarvel

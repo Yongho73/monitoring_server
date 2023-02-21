@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <Properties>
+        <property name="LOG_PATH" value="./logs/"/>
+        <property name="LOG_DAYS" value="7d"/>
+        <property name="LOG_FILESIZE" value="100MB"/>
+        <Property name="LOG_FORMAT">[%date{yyyy-MM-dd HH:mm:ss}] %level %logger{36}(%file:%line) - %msg%n</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${LOG_FORMAT}"/>
+        </Console>
+
+        <RollingFile name="file"
+                     fileName="${LOG_PATH}/ccdm.log"
+                     filePattern="${LOG_PATH}/ccdm_%d{yyyyMMdd}.log">
+            <PatternLayout pattern="${LOG_FORMAT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${LOG_PATH}">
+                    <IfFileName glob="*.log"/>
+                    <IfLastModified age="${LOG_DAYS}"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <RollingFile name="sql"
+                     fileName="${LOG_PATH}/sql.log"
+                     filePattern="${LOG_PATH}/sql_%d{yyyyMMdd}.log">
+            <PatternLayout pattern="${LOG_FORMAT}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${BASE_DIR}">
+                    <IfFileName glob="*.log"/>
+                    <IfLastModified age="${LOG_DAYS}"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- Log everything in Spring Boot -->
+        <logger name="org.springframework.boot" level="warn" additivity="false">
+            <appenderRef ref="console" />
+            <AppenderRef ref="file"/>
+        </logger>
+
+        <!-- Log everything in Spring Core -->
+        <logger name="org.springframework.core" level="warn" additivity="false">
+            <appenderRef ref="console" />
+            <appenderRef ref="file"/>
+        </logger>
+
+        <logger name="org.apache.tomcat" level="debug" additivity="false">
+            <appenderRef ref="console" />
+            <appenderRef ref="file"/>
+        </logger>
+
+        <logger name="org.apache.catalina" level="debug" additivity="false">
+            <appenderRef ref="console" />
+            <appenderRef ref="file"/>
+        </logger>
+
+        <logger name="jdbc.sqlonly" level="off" additivity="false"/>
+        <logger name="jdbc.audit" level="off" additivity="false"/>
+        <logger name="jdbc.resultset" level="off" additivity="false"/>
+        <logger name="jdbc.connection" level="off" additivity="false"/>
+
+        <logger name="jdbc.sqltiming" level="info" additivity="false">
+            <appenderRef ref="console" />
+            <appenderRef ref="sql" />
+        </logger>
+
+        <logger name="jdbc.resultsettable" level="info" additivity="false">
+            <appenderRef ref="console" />
+            <appenderRef ref="sql" />
+        </logger>
+
+        <root level="debug">
+            <appenderRef ref="console" />
+            <appenderRef ref="file"/>
+        </root>
+    </Loggers>
+</configuration>

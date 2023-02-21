@@ -1,0 +1,53 @@
+server:
+  title: ${ext.projectName}
+  version: ${ext.appVersion}
+  tomcat:
+    accesslog:
+      enabled: true
+      directory: logs
+      suffix: .log
+      prefix: access
+      file-date-format: .yyyy-MM-dd
+      pattern: "%{yyyy-MM-dd HH:mm:ss}t %s %r %{User-Agent}i %{Referer}i %a %b %D"
+      max-days: 7
+      rotate: true
+    basedir: .
+
+spring:
+  profiles:
+    default: local
+  jmx:
+    enabled: false
+  web:
+    resources:
+      static-locations: classpath:/static
+      cache:
+        period: 0
+  banner:
+      location: classpath:/ccdm-banner.txt
+
+mybatis:
+  mapper-locations: mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
+  config: classpath:logback-spring.xml
+
+ccdm:
+  weather:
+    apiKey: 59c7102b9b58860b5c4a8928cad57838
+  co2:
+    apiKey: aJiYDAvnbnT0drD0ZRsXZFwkIMFuPCkk
+  locale:
+    defaultLocale: ko_KR
+    list:
+      -
+        locale: ko_KR
+        name: 한국어
+      -
+        locale: en_US
+        name: English

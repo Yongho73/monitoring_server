@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="false" />
+        <setting name="useGeneratedKeys" value="true" />
+        <setting name="defaultExecutorType" value="REUSE" />
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+		<setting name="callSettersOnNulls" value="true"/>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+    </settings>
+
+    <typeAliases>
+        <typeAlias alias="hmap" type="java.util.HashMap" />
+        <typeAlias alias="lmap" type="java.util.List" />
+        <typeAlias alias="map" type="java.util.Map" />
+
+        <typeAlias alias="dashboardExcelVO" type="kr.co.bizmarvel.ccdm.vo.dashboard.DashboardExcelVO" />
+        <typeAlias alias="dashboardVO" type="kr.co.bizmarvel.ccdm.vo.dashboard.DashboardVO" />
+        <typeAlias alias="deviceVO" type="kr.co.bizmarvel.ccdm.vo.device.DeviceVO" />
+        <typeAlias alias="codeVO" type="kr.co.bizmarvel.ccdm.vo.code.CodeVO" />
+        <typeAlias alias="sidoVO" type="kr.co.bizmarvel.ccdm.vo.weather.SidoVo" />
+        <typeAlias alias="weatherVO" type="kr.co.bizmarvel.ccdm.vo.weather.WeatherVo" />
+        <typeAlias alias="monitoringVO" type="kr.co.bizmarvel.ccdm.vo.monitoring.MonitoringVO" />
+    </typeAliases>
+</configuration>

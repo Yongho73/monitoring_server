@@ -1,0 +1,82 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.4'
+	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+	id 'java'
+	//id 'org.springframework.experimental.aot' version '0.12.1'
+}
+
+group = 'kr.co.bizmarvel'
+version = getCheckedOutGitCommitHash()
+sourceCompatibility = '11'
+apply plugin: 'java'
+//apply plugin: 'war'
+ext['tomcat.version'] = '9.0.67'
+
+ext {
+	appVersion = version
+	projectName = "CCD Monitoring System"
+}
+
+processResources {
+	filesMatching('**/application.yml') {
+		expand(project.properties)
+	}
+}
+
+configurations {
+	all {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+		exclude group: 'ch.qos.logback', module: 'logback-classic'
+		exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+	}
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	maven { url 'https://repo.spring.io/release' }
+	mavenCentral()
+}
+
+dependencies {
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-log4j2'
+	implementation group: 'org.mybatis.spring.boot', name: 'mybatis-spring-boot-starter', version: '2.2.2'
+	implementation group: 'org.bgee.log4jdbc-log4j2', name: 'log4jdbc-log4j2-jdbc4.1', version: '1.16'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.13.4'
+	implementation group: 'org.json', name: 'json', version: '20220924'
+	implementation group: 'com.google.code.findbugs' ,name: 'jsr305', version:'3.0.2'
+	implementation group: 'org.apache.poi', name: 'poi', version: '4.1.2'
+	implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.2'
+	implementation group: 'com.google.code.gson', name: 'gson', version: '2.10'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-mongodb'
+	compileOnly group: "org.springframework.boot", name: "spring-boot-devtools"
+	compileOnly group: 'org.projectlombok', name: 'lombok'
+	developmentOnly group: 'org.springframework.boot', name: 'spring-boot-devtools'
+	runtimeOnly group: 'mysql', name: 'mysql-connector-java'
+	annotationProcessor group: 'org.projectlombok', name: 'lombok'
+	testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+tasks.named('bootBuildImage') {
+	builder = 'paketobuildpacks/builder:tiny'
+	environment = ['BP_NATIVE_IMAGE': 'true']
+}
+
+def getCheckedOutGitCommitHash() {
+	def gitFolder = "$projectDir/.git/"
+	def takeFromHash = 12
+	def head = new File(gitFolder + "HEAD").text.split(":") // .git/HEAD
+	def isCommit = head.length == 1
+
+	if(isCommit) return head[0].trim().take(takeFromHash)
+
+	def refHead = new File(gitFolder + head[1].trim())
+	refHead.text.trim().take takeFromHash
+}
